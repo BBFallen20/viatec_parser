@@ -15,11 +15,18 @@ def parse(url):
         print('[+]Connected.')
         print('=' * 50)
         hardware = []
+        manufacturer, resolution = None, None
+        question = input("Add manufacturer?1-Yes|2-No\n")
+        if question == '1':
+            manufacturer = input('Enter manufacturer:\n')
+        question = input("Add resolution?1-Yes|2-No\n")
+        if question == '1':
+            resolution = input("Enter resolution:\n")
         pages = get_pages(page.text)
         for page in range(1, pages+1):
             print(f'Info checking {page} from {pages}')
             page = get_html(url, params={'page': page})
-            hardware.extend(content(page.text))
+            hardware.extend(content(page.text, manufacturer if manufacturer else '', resolution if resolution else ''))
         print(f'''{'='*50}
 \t\t\t\tReady!
 Finded: {len(hardware)} products.
@@ -55,8 +62,8 @@ def get_pages(page):
         return 1
 
 
+def content(page, manufacturer = '', resolution = ''):
 
-def content(page):
     soup = BeautifulSoup(page, 'html.parser')
     # Парсим все карточки из каталога
     cards = soup.find_all('a', class_='product-item')
@@ -69,9 +76,10 @@ def content(page):
             'articul': card.find('div', class_='product-item__description').find('span').get_text(strip=True), # Арикул
             'link': card.get('href'), # СсылОЧКА
             'image': card.find('img').get('src'), # Ссылка на картинку
-            'price': card.find('div', class_='product-item__price').get_text(strip=True),
-            'available': card.find('p').get_text(strip=True),
-            # 'description': card.find('div', class_='product-item__characteristics').get_text(strip=True)
+            'price': card.find('div', class_='product-item__price').get_text(strip=True), # Цена
+            'available': card.find('p').get_text(strip=True), # Наличие
+            'manufacturer': manufacturer, # Производитель
+            'resolution': resolution, # Качество
 
         })
     return videocards
