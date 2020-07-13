@@ -16,22 +16,21 @@ def parse(url):
         print('=' * 50)
         hardware = []
         manufacturer, resolution = None, None
+        cameratype = input("Cameratype:\n")
+        resolution = input('Resolution:\n')
         question = input("Add manufacturer?1-Yes|2-No\n")
         if question == '1':
             manufacturer = input('Enter manufacturer:\n')
-        question = input("Add resolution?1-Yes|2-No\n")
-        if question == '1':
-            resolution = input("Enter resolution:\n")
         pages = get_pages(page.text)
         for page in range(1, pages+1):
             print(f'Info checking {page} from {pages}')
             page = get_html(url, params={'page': page})
-            hardware.extend(content(page.text, manufacturer if manufacturer else '', resolution if resolution else ''))
+            hardware.extend(content(page.text, cameratype, resolution, manufacturer if manufacturer else ''))
         print(f'''{'='*50}
 \t\t\t\tReady!
 Finded: {len(hardware)} products.
 {'='*50}''')
-        path = input("Enter way to save the file:\n")
+        path = 'C:/Users/Public/Desktop'
         filename = "/" + input('Enter filename:\n')+'.csv'
         path += filename
         try:
@@ -62,11 +61,11 @@ def get_pages(page):
         return 1
 
 
-def content(page, manufacturer = '', resolution = ''):
+def content(page, cameratype, resolution,  manufacturer='', category='Видеонаблюдение, Камеры'):
 
     soup = BeautifulSoup(page, 'html.parser')
     # Парсим все карточки из каталога
-    cards = soup.find_all('a', class_='product-item')
+    cards = soup.find_all('a', class_='product-item')[:-10]
     # Словарь для итоговых значений
     videocards = []
     # Циклом проходимся по всем карточкам,собирая инфу
@@ -76,10 +75,12 @@ def content(page, manufacturer = '', resolution = ''):
             'articul': card.find('div', class_='product-item__description').find('span').get_text(strip=True), # Арикул
             'link': card.get('href'), # СсылОЧКА
             'image': card.find('img').get('src'), # Ссылка на картинку
-            'price': card.find('div', class_='product-item__price').get_text(strip=True), # Цена
+            'price': card.find('div', class_='product-item__price').get_text(strip=True).replace('грн', ""), # Цена
             'available': card.find('p').get_text(strip=True), # Наличие
             'manufacturer': manufacturer, # Производитель
             'resolution': resolution, # Качество
+            'category': category,
+            'type': cameratype,
 
         })
     return videocards

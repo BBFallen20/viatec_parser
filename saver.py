@@ -1,9 +1,9 @@
 import csv
 
 def save(items, path):
-    with open(path, 'w', newline='', errors='ignore') as file:
+    with open(path, 'w', newline='', errors='ignore', encoding='utf-8') as file:
         writer = csv.writer(file, delimiter=';')
-        writer.writerow(["Модель", "Артикул", "Ссылка", "Изображение", "Цена", "Наличие", "Производитель", "Качество камеры"])
+        writer.writerow(["Модель", "Артикул", "Ссылка", "Изображение", "Цена", "Наличие", "Производитель", 'Категория', 'Тип камеры', 'Разрешение'])
         for item in items:
             writer.writerow([item['title'], 
                              item['articul'],
@@ -11,4 +11,7 @@ def save(items, path):
                              item['price'],
                              item['available'], 
                              item['manufacturer'],
-                             item['resolution']])
+                             item['category'],
+                             item['type'],
+                             item['resolution'],
+                             ])
